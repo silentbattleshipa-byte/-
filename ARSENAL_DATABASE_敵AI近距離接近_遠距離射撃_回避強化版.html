@@ -2923,7 +2923,7 @@ body.local2p #battleDeploySurface { right: 50%; width: 50%; } /* 出撃レイヤ
         const abilityHead = asum && asum.name !== "－"
           ? `<p class="modal-ability">ABILITY「${esc(asum.name)}」／コスト${esc(dispNum(card.abilityCostRaw ?? card.abilityCost))}／射程${esc(asum.range)}マス${asum.deployTrigger ? "／<b>出撃と同時に自動発動（コスト0）</b>" : ""}</p>` : "";
         const abilitySpec = asum && asum.name !== "－"
-          ? `<div class="spec-grid">${asum.multiplier ? `<span>アビリティ倍率<b>×${esc(asum.multiplier)}</b></span>` : ""}${asum.cooldown ? `<span>CT<b>${esc(asum.cooldown)}カウント</b></span>` : ""}${asum.duration ? `<span>持続<b>${esc(asum.duration)}秒</b></span>` : ""}${asum.stunSec ? `<span>スタン<b>${esc(asum.stunSec)}秒</b></span>` : ""}<span>消費SPゲージ<b>${esc(dispNum(card.spCost))}コスト＝${esc(num(card.spCost) * CARD_RULES.spGaugePerCost)}%</b></span></div>` : "";
+          ? `<div class="spec-grid">${asum.multiplier ? `<span>アビリティ倍率<b>×${esc(asum.multiplier)}</b></span>` : ""}${asum.cooldown ? `<span>CT<b>${esc(asum.cooldown)}カウント</b></span>` : ""}${asum.duration ? `<span>持続<b>${esc(asum.duration)}秒</b></span>` : ""}${asum.stunSec ? `<span>スタン<b>${esc(asum.stunSec)}秒</b></span>` : ""}<span>消費コスト<b>${esc(dispNum(card.abilityCostRaw ?? card.abilityCost))}</b></span>${asum.deployTrigger ? "<span>発動条件<b>出撃と同時</b></span>" : `<span>発動条件<b>任意発動</b></span>`}<span>射程<b>${esc(asum.range)}${asum.range !== "－" ? "マス" : ""}</b></span></div>` : "";
         const spHead = ssum && ssum.name !== "－"
           ? `<p class="modal-ability">SP「${esc(ssum.name)}」／コスト${esc(dispNum(card.spCost))}／威力${esc(dispNum(card.spPower))}／射程${esc(dispNum(card.spRange))}マス／対象${esc(ssum.target || "－")}／${esc(card.spType || "")}</p><div class="spec-grid"><span>SPゲージ消費<b>${esc(num(card.spCost) * CARD_RULES.spGaugePerCost)}%</b></span><span>対象形状<b>${esc({ single: "単体", area: "範囲", pierce: "貫通", all: "全体" }[ssum.shape] || "単体")}</b></span><span>攻撃種別<b>${esc(ssum.type === "slash" ? "格闘" : "射撃")}</b></span>${ssum.oncePerSortie ? "<span>使用回数<b>出撃毎1度</b></span>" : ""}</div>${ssum.effect ? `<p>${esc(ssum.effect)}</p>` : ""}` : "";
         const unitedHead = usum
@@ -7874,6 +7874,11 @@ function battleTick() {
         get terrainRankFor() { return terrainRankFor; },
         spCostForUnit, spGaugeRequired, effectiveAttackPower, applyGuidanceLock,
         classifyAbility, combatAbilitySpec, lockTarget, inAbilityRange, abilityTargets, abilityAreaEnemies,
+        // カード仕様（射程/武装/アビリティ/SP/連接SP/地形/PL条件）の確認用ハンドラ
+        CARD_RULES, rangeSummaryFor, abilitySpecSummary, spSpecSummary, unitedSpSummary, terrainSummaryFor, plConditionSummary,
+        weaponProfile, canSwitchToSub, applyWeaponSwitch, weaponAttackPower,
+        get weaponRangeWorld() { return attackRangeWorld; },
+        get weaponInterval() { return attackIntervalFor; },
         // デバッグ用：準備画面をスキップして即バトル開始
         skipPrep() {
           if (battleState.prepTimer) { clearTimeout(battleState.prepTimer); battleState.prepTimer = null; }
