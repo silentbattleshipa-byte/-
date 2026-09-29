@@ -7726,7 +7726,16 @@ function battleTick() {
 
       Object.values(state.cards).flat().forEach((card) => { card.kind = card.kind || (state.cards.tactics.includes(card) ? "tactics" : state.cards.pl.includes(card) ? "pl" : "ms"); });
       renderAll();
-      tryAutoLoad();
+
+      // ===== 自動スタート: 開いた直後からカード選択を揃えて自動出撃 ===== =====
+      const AUTO_START = true;
+      tryAutoLoad().finally(() => {
+        if (!AUTO_START) return;
+        setTimeout(() => {
+          if (!state.deck.ms.length || !state.deck.pl.length) setDemoDeck();
+          startBattle(commander.mode || "rank");
+        }, 300);
+      });
 
       // ===== ONLINE MATCH / WEBSOCKET =====
       const onlineState={ws:null,role:null,room:null,connected:false,deckSent:false};
